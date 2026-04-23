@@ -1,0 +1,99 @@
+version: 1
+project:
+  title: "The Enterprise Data Stack: A Practitioner's Handbook"
+  authors:
+    - name: Karthik Srinivasan
+      url: https://business.ku.edu/people/karthik-srinivasan
+      affiliation: University of Kansas School of Business
+  copyright: '2026'
+  github: KarAnalytics/EnterpriseDataStack
+  exports:
+    - format: typst
+      template: plain_typst_book
+      output: enterprise-data-stack.pdf
+  toc:
+    - file: intro.md
+    - title: "How to Use This Book"
+      children:
+        - file: chapters/how-to-use/intro.md
+    - title: "Ch 1: Course Introduction"
+      children:
+        - file: chapters/course-intro/intro.md
+    - title: "Ch 2: EDM Foundations"
+      children:
+        - file: chapters/edm-foundations/intro.md
+    - title: "Ch 3: SQL — DDL, DCL, DML"
+      children:
+        - file: chapters/sql-ddl-dcl-dml/intro.md
+    - title: "Ch 4: SQL Queries"
+      children:
+        - file: chapters/sql-queries/intro.md
+    - title: "Ch 5: SQL Advanced Queries"
+      children:
+        - file: chapters/sql-advanced/intro.md
+    - title: "Ch 6: Data Processing"
+      children:
+        - file: chapters/data-processing/intro.md
+    - title: "Ch 7: Data Processing with OpenRefine"
+      children:
+        - file: chapters/openrefine/intro.md
+    - title: "Ch 8: Data Profiling"
+      children:
+        - file: chapters/data-profiling/intro.md
+    - title: "Ch 9: Data Governance"
+      children:
+        - file: chapters/data-governance/intro.md
+    - title: "Ch 10: Database Concepts"
+      children:
+        - file: chapters/database-concepts/intro.md
+    - title: "Ch 11: Data Modeling with draw.io"
+      children:
+        - file: chapters/data-modeling/intro.md
+    - title: "Ch 12: Data Warehousing Concepts"
+      children:
+        - file: chapters/dw-concepts/intro.md
+    - title: "Ch 13: Data Warehouse Design"
+      children:
+        - file: chapters/dw-design/intro.md
+    - title: "Ch 14: Advanced DW Design"
+      children:
+        - file: chapters/dw-design-advanced/intro.md
+    - title: "Ch 15: DW Examples"
+      children:
+        - file: chapters/dw-examples/intro.md
+    - title: "Ch 16: ETL — DB to DW Procedure"
+      children:
+        - file: chapters/etl-procedure/intro.md
+    - title: "Ch 17: ETL — Northwind Example"
+      children:
+        - file: chapters/etl-northwind/intro.md
+    - title: "Ch 18: Graph Databases"
+      children:
+        - file: chapters/graph-databases/intro.md
+    - title: "Ch 19: Introduction to Hadoop"
+      children:
+        - file: chapters/hadoop/intro.md
+    - title: "Ch 20: Dataproc Cluster on GCP"
+      children:
+        - file: chapters/gcp-dataproc/intro.md
+    - title: "Ch 21: Apache Spark"
+      children:
+        - file: chapters/spark/intro.md
+    - title: "Ch 22: Vector Databases"
+      children:
+        - file: chapters/vector-databases/intro.md
+    - title: Appendix
+      children:
+        - file: chapters/appendix/glossary.md
+        - file: chapters/appendix/project_ideas.md
+site:
+  title: The Enterprise Data Stack
+  options:
+    logo: logo.png
+    favicon: logo.png
+    folders: true
+    BASE_URL: /EnterpriseDataStack
+  template: book-theme
+  actions:
+    - title: Download PDF
+      url: /EnterpriseDataStack/enterprise-data-stack.pdf
