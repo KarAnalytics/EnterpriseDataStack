@@ -1,4 +1,4 @@
-name: MyST Build and Deploy
+name: Build and deploy MyST site to GitHub Pages
 
 on:
   push:
@@ -12,42 +12,33 @@ permissions:
 
 concurrency:
   group: pages
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Setup Node
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: "20"
 
-      - name: Install MyST
+      - name: Install mystmd
         run: npm install -g mystmd
 
-      - name: Setup Typst (for PDF export)
+      - name: Install Typst
         uses: typst-community/setup-typst@v3
 
-      - name: Build HTML
+      - name: Build HTML + PDF
         env:
           BASE_URL: /EnterpriseDataStack
-        run: myst build --html
-
-      - name: Build PDF
-        env:
-          BASE_URL: /EnterpriseDataStack
-        run: myst build --pdf
-        continue-on-error: true
-
-      - name: Copy PDF into site output
         run: |
-          mkdir -p _build/html/exports
-          cp exports/*.pdf _build/html/ 2>/dev/null || true
-          cp _build/exports/*.pdf _build/html/ 2>/dev/null || true
+          myst build --html
+          myst build --pdf
+          cp enterprise-data-stack.pdf _build/html/ 2>/dev/null || true
+
+      - uses: actions/configure-pages@v5
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
@@ -61,6 +52,5 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
-      - name: Deploy to GitHub Pages
+      - uses: actions/deploy-pages@v4
         id: deployment
-        uses: actions/deploy-pages@v4
