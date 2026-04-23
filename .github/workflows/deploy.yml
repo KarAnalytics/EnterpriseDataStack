@@ -33,9 +33,13 @@ jobs:
         uses: typst-community/setup-typst@v3
 
       - name: Build HTML
+        env:
+          BASE_URL: /EnterpriseDataStack
         run: myst build --html
 
       - name: Build PDF
+        env:
+          BASE_URL: /EnterpriseDataStack
         run: myst build --pdf
         continue-on-error: true
 
