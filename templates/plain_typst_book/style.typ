@@ -107,12 +107,9 @@
 
   show link: set text(fill: blue.darken(30%))
 
-  // Suppress weak pagebreaks. MyST inserts pagebreak(weak: true) between
-  // child files (sub-chapter notebooks/markdown), which leaves blank space
-  // at the bottom of pages whenever a sub-file boundary lands mid-page.
-  // Hard pagebreaks (it.weak == false) are still emitted, so chapter
-  // breaks from the heading show rule below are preserved.
-  show pagebreak: it => if it.weak { } else { it }
+  // This book's table of contents is flat, so MyST puts a hard pagebreak between chapter
+  // files. Chapter headings below therefore use a *weak* pagebreak, which is skipped when
+  // the chapter already starts on a fresh page (avoiding a blank page before every chapter).
 
   // Make blocks breakable across pages so a sub-section that doesn't fit
   // on the remaining space can split rather than push to a fresh page.
@@ -230,7 +227,7 @@
 // counter after front-matter unnumbered chapters so the next chapter starts
 // at the correct number.
   show heading.where(level: 1): it => {
-    pagebreak()
+    pagebreak(weak: true)
     counter(figure).update(0)
     counter(figure.where(kind: table)).update(0)
     counter(math.equation).update(0)
