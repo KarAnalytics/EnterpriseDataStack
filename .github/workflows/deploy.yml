@@ -35,8 +35,51 @@ jobs:
           BASE_URL: /EnterpriseDataStack
         run: |
           myst build --html
-          myst build --pdf
-          cp enterprise-data-stack.pdf _build/html/ 2>/dev/null || true
+          # The first PDF build downloads the plain_typst_book template into
+          # _build/templates/typst/myst/plain_typst_book/. Overwrite it with the
+          # customized copy in templates/ (cover page with the faded cover image,
+          # navy theme, "Chapter N" headings, grey code blocks), then force a
+          # rebuild so the customizations take effect.
+          myst build --pdf || true
+          TEMPLATE_DIR=_build/templates/typst/myst/plain_typst_book
+          if [ -d "$TEMPLATE_DIR" ]; then
+            echo "Patching $TEMPLATE_DIR with local customizations"
+            cp templates/plain_typst_book/style.typ "$TEMPLATE_DIR/style.typ"
+            cp templates/plain_typst_book/template.typ "$TEMPLATE_DIR/template.typ"
+            cp templates/plain_typst_book/template.yml "$TEMPLATE_DIR/template.yml"
+          else
+            echo "ERROR: expected template dir $TEMPLATE_DIR not found"
+            ls -R _build/templates || true
+            exit 1
+          fi
+          rm -f enterprise-data-stack.pdf
+          myst build --pdf --force
+          # Serve the PDF at karanalytics.github.io/EnterpriseDataStack/enterprise-data-stack.pdf
+          cp enterprise-data-stack.pdf _build/html/
+
+      - name: Fix canonical site URL for SEO
+        # MyST bakes the dev-server host into canonical links, og:url, the
+        # sitemap and robots.txt. BASE_URL already adds the /EnterpriseDataStack
+        # prefix, so only the scheme and host need replacing.
+        run: |
+          find _build/html -type f \( -name '*.html' -o -name '*.json' -o -name '*.xml' -o -name '*.txt' \) \
+            -exec sed -i 's#http://localhost:3000#https://karanalytics.github.io#g' {} +
+
+      - name: Inject GoatCounter analytics
+        # Disabled until the "enterprisedatastack" site exists on goatcounter.com
+        # (with "Allow adding visitor counts on your website" turned on).
+        # To enable, delete the `if: false` line below.
+        if: false
+        # Done after `myst build` so MyST never sees these tags (it strips
+        # <script> from page content). Both injections only touch <head>/<body>,
+        # never MyST's content JSON, so React hydration stays valid.
+        run: |
+          # 1. Tracking: count every page view.
+          GC_SCRIPT='<script data-goatcounter="https://enterprisedatastack.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>'
+          find _build/html -name '*.html' -exec sed -i "s#</head>#${GC_SCRIPT}</head>#" {} +
+          # 2. Visible counter: a small fixed footer line with the unique-visitor count.
+          cp assets/gc-counter.js _build/html/gc-counter.js
+          find _build/html -name '*.html' -exec sed -i 's|</body>|<script src="/EnterpriseDataStack/gc-counter.js"></script></body>|' {} +
 
       - uses: actions/configure-pages@v5
 

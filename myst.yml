@@ -11,83 +11,50 @@ project:
     - format: typst
       template: plain_typst_book
       output: enterprise-data-stack.pdf
+      justification: true
+      show_pagenumber: true
+      cover_affiliation: University of Kansas School of Business
+      margin_left: 10
+      margin_right: 10
+      cover: cover_faded.png
+      cover_width: 10
+      coverposition: 2
   toc:
     - file: intro.md
-    - title: "How to Use This Book"
-      children:
-        - file: chapters/how-to-use/intro.md
-    - title: "Ch 1: EDM Foundations"
-      children:
-        - file: chapters/edm-foundations/intro.md
-    - title: "Ch 2: SQL — DDL, DCL, DML"
-      children:
-        - file: chapters/sql-ddl-dcl-dml/intro.md
-    - title: "Ch 3: SQL Queries"
-      children:
-        - file: chapters/sql-queries/intro.md
-    - title: "Ch 4: SQL Advanced Queries"
-      children:
-        - file: chapters/sql-advanced/intro.md
-    - title: "Ch 5: Data Processing"
-      children:
-        - file: chapters/data-processing/intro.md
-    - title: "Ch 6: Data Processing with OpenRefine"
-      children:
-        - file: chapters/openrefine/intro.md
-    - title: "Ch 7: Data Profiling"
-      children:
-        - file: chapters/data-profiling/intro.md
-    - title: "Ch 8: Data Governance"
-      children:
-        - file: chapters/data-governance/intro.md
-    - title: "Ch 9: Database Concepts"
-      children:
-        - file: chapters/database-concepts/intro.md
-    - title: "Ch 10: Data Modeling with draw.io"
-      children:
-        - file: chapters/data-modeling/intro.md
-    - title: "Ch 11: Data Warehousing Concepts"
-      children:
-        - file: chapters/dw-concepts/intro.md
-    - title: "Ch 12: Data Warehouse Design"
-      children:
-        - file: chapters/dw-design/intro.md
-    - title: "Ch 13: Advanced DW Design"
-      children:
-        - file: chapters/dw-design-advanced/intro.md
-    - title: "Ch 14: DW Examples"
-      children:
-        - file: chapters/dw-examples/intro.md
-    - title: "Ch 15: ETL — DB to DW Procedure"
-      children:
-        - file: chapters/etl-procedure/intro.md
-    - title: "Ch 16: ETL — Northwind Example"
-      children:
-        - file: chapters/etl-northwind/intro.md
-    - title: "Ch 17: Graph Databases"
-      children:
-        - file: chapters/graph-databases/intro.md
-    - title: "Ch 18: Introduction to Hadoop"
-      children:
-        - file: chapters/hadoop/intro.md
-    - title: "Ch 19: Dataproc Cluster on GCP"
-      children:
-        - file: chapters/gcp-dataproc/intro.md
-    - title: "Ch 20: Apache Spark"
-      children:
-        - file: chapters/spark/intro.md
-    - title: "Ch 21: Vector Databases"
-      children:
-        - file: chapters/vector-databases/intro.md
+    - file: chapters/how-to-use/intro.md
+    - file: chapters/edm-foundations/intro.md
+    - file: chapters/data-processing/intro.md
+    - file: chapters/openrefine/intro.md
+    - file: chapters/data-profiling/intro.md
+    - file: chapters/data-governance/intro.md
+    - file: chapters/regular-expressions/intro.md
+    - file: chapters/er-model/intro.md
+    - file: chapters/data-modeling/intro.md
+    - file: chapters/relational-model/intro.md
+    - file: chapters/normalization/intro.md
+    - file: chapters/dw-concepts/intro.md
+    - file: chapters/dw-design/intro.md
+    - file: chapters/dw-design-advanced/intro.md
+    - file: chapters/dw-examples/intro.md
+    - file: chapters/sql-ddl-dcl-dml/intro.md
+    - file: chapters/sql-queries/intro.md
+    - file: chapters/sql-advanced/intro.md
+    - file: chapters/etl-procedure/intro.md
+    - file: chapters/etl-northwind/intro.md
+    - file: chapters/graph-databases/intro.md
+    - file: chapters/hadoop/intro.md
+    - file: chapters/spark/intro.md
     - title: Appendix
       children:
+        - file: chapters/appendix/oracle-cloud.md
+        - file: chapters/appendix/sh-schema.md
         - file: chapters/appendix/glossary.md
         - file: chapters/appendix/project_ideas.md
 site:
   title: The Enterprise Data Stack
   options:
-    logo: logo.png
-    favicon: logo.png
+    logo: cover.png
+    favicon: cover.png
     folders: true
     BASE_URL: /EnterpriseDataStack
   template: book-theme

@@ -1,6 +1,6 @@
 # The Enterprise Data Stack: A Practitioner's Handbook
 
-Source for the MyST book that accompanies **BSAN 726: Enterprise Data Management** at the University of Kansas School of Business.
+Source for the MyST book that accompanies **BSAN 726 and BSAN 727: Enterprise Data Management** at the University of Kansas School of Business.
 
 Live site: https://karanalytics.github.io/EnterpriseDataStack/
 
@@ -47,7 +47,10 @@ The `.github/workflows/deploy.yml` workflow builds the site with MyST and publis
 ├── myst.yml                 # MyST project config and table of contents
 ├── intro.md                 # Landing page
 ├── chapters/                # One folder per chapter, each with intro.md
-├── logo.png                 # Site logo
+├── cover.png                # Cover image, site logo and favicon
+├── cover_faded.png          # Faded cover backdrop for the PDF
+├── templates/               # Customized Typst book template (PDF)
+├── assets/                  # GoatCounter visitor counter script
 ├── requirements.txt         # Python deps for CI
 └── .github/workflows/       # GitHub Actions for Pages deploy
 ```

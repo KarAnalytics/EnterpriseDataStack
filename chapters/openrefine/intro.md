@@ -1,65 +1,161 @@
 # Data Processing with OpenRefine
 
-OpenRefine (née Google Refine) is a free, open-source desktop tool for exploring, cleaning, and reshaping messy tabular data. It runs locally in your browser and shines at the kind of interactive, iterative cleanup that is painful in SQL and noisy in pandas.
+Writing code is not the only way to clean data. **OpenRefine** is a free desktop tool that lets you explore and fix messy data interactively, with features (facets and clustering) that make inconsistencies jump out, and a complete record of every change you make. This chapter introduces OpenRefine's core workflow and walks through cleaning the Fortune Global 500 file from the [previous chapter](../data-processing/intro.md).
 
-## When to reach for OpenRefine
+:::{tip} Learning objectives
+After this chapter you should be able to:
 
-- You have a flat file (CSV, Excel, TSV, JSON) that needs cleanup before it's worth loading into a database
-- You're looking at free-text fields (city names, company names, job titles) with lots of spelling variants
-- You want a reversible, auditable cleanup history — every operation can be undone and exported as a script
-- You want a GUI while still being able to write expressions in a real language (GREL, Python, Jython, Clojure)
+1. Create an OpenRefine project from a file, choosing the right import options.
+2. Explore data with text, numeric and blank facets and text filters.
+3. Find and merge variant spellings with clustering.
+4. Transform cells and add columns with common transforms and GREL expressions.
+5. Save a project's operation history and export the cleaned data.
+:::
 
-## Core workflow
+## What OpenRefine is
 
-1. **Create a project** — drop in a file; OpenRefine parses it and shows a preview
-2. **Facet** — click a column, choose "Text facet" or "Numeric facet" to see distinct values and their counts
-3. **Cluster** — use OpenRefine's algorithms (key collision, nearest neighbor) to group near-duplicate strings and merge them
-4. **Transform** — apply GREL expressions to clean values, split columns, extract substrings, parse dates
-5. **Export** — back to CSV / Excel / TSV / JSON, or push directly to a Google Sheet
+OpenRefine (formerly Google Refine) is a standalone, open-source desktop application for data cleanup and transformation. It runs on your own computer and opens in your web browser, so your data never leaves your machine. Download it from [openrefine.org](https://openrefine.org), start it, and it opens a page at `http://127.0.0.1:3333`.
 
-## Faceting
+It shines at three things:
 
-Facets are dynamic filters over a column. Text facets show every distinct value; numeric facets show a histogram; timeline facets show a date distribution. Facets are the single fastest way to spot inconsistencies — a "Gender" column with values `M`, `F`, `Male`, `female`, `m `, `f ` (with trailing space) reveals itself instantly.
+- **Facets**: instant summaries of a column's values, which double as filters.
+- **Clustering**: finding values that are probably the same thing typed differently.
+- **Repeatable transformations**: every change is recorded as an operation that can be undone, replayed, or applied to the next file.
 
-## Clustering — the killer feature
+OpenRefine is one of many processing tools. Almost everything it does can also be programmed in Python or R, which is better for large or automated jobs. OpenRefine is best for exploring a new dataset and fixing it interactively, especially for people who do not program.
 
-Clustering groups values that *look similar but are written differently*. OpenRefine offers multiple methods:
+## The workflow
 
-- **Key collision** — fingerprint, n-gram fingerprint, phonetic (Metaphone3, Cologne, Beider-Morse, Daitch-Mokotoff)
-- **Nearest neighbor** — Levenshtein, PPM
 
-Example: a "Company" column containing `IBM`, `I.B.M.`, `International Business Machines`, `Ibm Corp.`, and `ibm inc` will cluster together. You pick the canonical name and merge the cluster with one click.
+:::{figure} images/openrefine_workflow.png
+:label: fig-openrefine-workflow
+:alt: Five steps in a row: import, explore, cluster, transform and export, above a bar for the undo and redo history that records every operation.
+The OpenRefine workflow. Every operation is recorded in the project history. Source: {download}`openrefine_workflow.drawio <images/openrefine_workflow.drawio>`.
+:::
 
-## GREL — General Refine Expression Language
+### 1. Create a project
 
-A small expression language for transforms. A few common patterns:
+1. Click **Create Project**, then choose **This Computer** (upload a file) or **Web Addresses (URLs)**.
+2. On the preview screen, check the **parsing options**: the file type (CSV, Excel, JSON, ...), the **character encoding**, whether the first row holds column headers, and whether to **parse cell text into numbers and dates**. The preview updates as you change them.
+3. Name the project and click **Create Project »** at the top right.
 
-```
-value.trim().toLowercase()                           // clean strings
-value.replace(/\s+/, ' ')                            // collapse whitespace (regex)
-value.toDate('MM/dd/yyyy').toString('yyyy-MM-dd')    // normalize date format
-if(isBlank(value), cells['OtherCol'].value, value)   // conditional fill
-value.split('@')[1]                                  // extract domain from email
-cells['First'].value + ' ' + cells['Last'].value     // combine columns
-```
+### 2. Explore with facets and filters
 
-## Provenance and reproducibility
+Every column has a menu (the small triangle in its header). **Facet** opens a summary panel on the left:
 
-Every action lives in OpenRefine's undo/redo history. You can export that history as a JSON **operation recipe** and re-apply it to the next batch of data — the same cleanup, reproducibly, on new inputs. This is what makes OpenRefine defensible for enterprise use, not just one-off analysis.
+- A **text facet** lists every distinct value with its count. Click a value to show only those rows; hover over it and choose **edit** to change every cell with that value at once.
+- A **numeric facet** shows a histogram; drag the handles to select a range, and see how many rows are non-numeric, blank or errors.
+- **Customized facets** include **facet by blank** (which rows are empty?) and **timeline facets** for dates.
+- A **text filter** shows only the rows whose cells contain a string.
 
-## Limits
+Facets combine: select a value in one facet and a range in another, and OpenRefine shows the rows that satisfy both. Any edit applies only to the rows currently selected.
 
-- In-memory processing — starts to struggle above a few million rows
-- Single user — no collaborative editing
-- Schema-less — good for cleanup, not for long-term storage
+### 3. Cluster similar values
 
-The typical pattern is: use OpenRefine to clean, export to CSV, load to a database.
+**Clustering** groups values that are probably the same thing with different spellings, capitalization, spacing or punctuation. Open it from a text facet's **Cluster** button, or from **Edit cells > Cluster and edit**. Suppose a survey's City column contains:
 
-## Learning outcomes
+| Value | Count |
+|---|---|
+| Kansas City | 412 |
+| kansas city | 37 |
+| KANSAS CITY | 12 |
+| Kansas  City (two spaces) | 5 |
+| Kansas City. | 3 |
+| Kansas Cty | 2 |
+| KC | 9 |
 
-- Install OpenRefine and create a project from a CSV or Excel file
-- Use text, numeric, and timeline facets to diagnose data quality issues
-- Cluster and merge near-duplicate values
-- Write GREL expressions for common transforms
-- Export a cleanup recipe for reproducible reuse
+OpenRefine offers two families of methods:
 
+- **Key collision** methods compute a key for each value and group values with the same key. The default, **fingerprint**, trims the value, lowercases it, removes punctuation, and sorts its words, so the first five values above all get the key `city kansas` and form one cluster. Phonetic keys (such as Metaphone) group values that *sound* alike.
+- **Nearest neighbor** methods group values within a small edit distance of each other, such as **Levenshtein** distance. This catches the typo "Kansas Cty", which differs from "Kansas City" by one letter.
+
+For each cluster, review the values, tick **Merge?**, type the value to keep, and click **Merge selected**. Clustering suggests; you decide. "KC" will not be found by either method, so it needs a rule of its own (edit it in the text facet).
+
+If a text facet shows no clusters, that is good news: the column is already consistent.
+
+### 4. Transform cells
+
+The **Edit cells > Common transforms** menu handles the everyday fixes: **Trim leading and trailing whitespace**, **Collapse consecutive whitespace**, **To titlecase**, **To uppercase**, **To lowercase**, **To number**, **To date** and **To text**.
+
+For anything else, **Edit cells > Transform...** accepts an expression in **GREL** (General Refine Expression Language), where `value` is the current cell's value:
+
+| Goal | GREL expression |
+|---|---|
+| Trim spaces | `value.trim()` |
+| Title case | `value.toTitlecase()` |
+| Replace text | `value.replace("St.", "Street")` |
+| Parse a US-style date | `value.toDate("MM/dd/yyyy")` |
+| Write a date as `yyyy-MM-dd` | `value.toString("yyyy-MM-dd")` |
+| Use another column | `cells["EmployeeCount"].value` |
+
+Dates matter: a column of `MM/DD/YYYY` text, common in exported files, is not a standard timestamp format for most enterprise systems. Convert it to a real date (**To date** or `toDate`), and export it in ISO format (`2026-03-14`).
+
+**Edit column > Add column based on this column...** creates a new column from a GREL expression, and **Split into several columns...** parses one column into many (for example, "City, State").
+
+### 5. Keep the history and export
+
+The **Undo / Redo** tab lists every operation since the project was created. Click any earlier step to go back to it. **Extract...** saves the operations as JSON, and **Apply...** replays them on another project, so next month's file can be cleaned with one click. This record is also documentation: it shows exactly how the cleaned data was produced.
+
+When you are done, **Export** (top right) writes the data as CSV, TSV, Excel or other formats. Exported data contains only the rows matching the current facets, so clear your facets first if you want everything.
+
+## Worked example: cleaning the Fortune Global 500
+
+1. **Import with the right encoding.** Create a project from the URL `https://raw.githubusercontent.com/KarAnalytics/datasets/master/FortuneGlobal500_2024.csv`. In the parsing options, set **Character encoding** to `windows-1252` and tick **Parse cell text into numbers, dates, ...**. Check the preview: *Düsseldorf* and *São Paulo* should look right. If they show odd symbols, the encoding is wrong.
+
+2. **Find the damaged city.** On **Hqcity**, apply a **text filter** for `?`. One row remains: Orlen, in "P?ock". Click the cell, choose **edit**, and type `Płock`. Remove the filter.
+
+3. **Inspect the industry column.** A **text facet** on **IndustrySector** shows 57 values. Sorting by name reveals two vocabularies mixed together: detailed industries ("Commercial Banks", "Petroleum Refining") and a handful of broad sectors ("Financials", "Industrials", "Materials", "Energy", "Technology", "Health Care", "Retail"). Two labels name the same industry: "Life and Health Insurance" (16 companies) and "Insurance: Life, Health (stock)" (2). In the facet, edit the second label to `Life and Health Insurance`; both rows change at once. Mapping the broad sectors onto the detailed list needs a business rule (which detailed industry does each company belong to?), so record it as an open issue rather than guessing.
+
+4. **Try clustering.** Click **Cluster** on the IndustrySector facet. Fingerprint finds no clusters: the problem in this column is two vocabularies, not typos. Clustering finds spelling variants; it cannot find synonyms.
+
+5. **Check the numbers.** A **numeric facet** on **EmployeeCount** shows a long right tail (Walmart, 2.1 million employees) and a tiny minimum: Rajesh Exports, with 141 employees. Before treating it as an error, check: it is a gold refiner and trader with very few staff for its revenue. A profile flags such values; a person decides what they mean.
+
+6. **Mark the blanks.** On **RankCng**, choose **Facet > Customized facets > Facet by blank**: 55 rows are blank. Add a numeric facet on **YearsOnList** alongside it and select 1: 13 of the blanks are companies new to the list. The other 42 kept their rank (see the [previous chapter](../data-processing/intro.md)).
+
+7. **Add a column.** On **RevenueMil**, choose **Edit column > Add column based on this column...**, name it `RevenuePerEmployee`, and enter `value * 1000000 / cells["EmployeeCount"].value`.
+
+8. **Save the recipe and export.** In **Undo / Redo**, click **Extract...** and save the JSON with your project notes. Clear all facets, then **Export > Comma-separated value**.
+
+## Common mistakes
+
+- **Skipping the preview.** A wrong encoding or a missed header row is easiest to fix before the project is created.
+- **Editing with a facet still selected.** The edit applies only to the matching rows, which may be what you want, or may not.
+- **Merging clusters without reading them.** "Austin" and "Boston" are not the same city, however close the algorithm thinks they are.
+- **Exporting a filtered view.** Clear the facets before exporting the full dataset.
+
+:::{warning} Check the AI
+GenAI assistants can write GREL and suggest clustering settings, but they often mix GREL up with Python or JavaScript syntax (for example, writing `value.title()` or `value.strip()`, which GREL does not have). Test every expression on the preview in the Transform dialog before applying it; the preview shows the result for the first rows. And never paste a dataset with personal information into an online assistant to have it "cleaned": OpenRefine runs locally precisely so your data stays on your machine.
+:::
+
+## Practice
+
+**1. Facets.** In the Fortune project, which headquarters country has the most companies, and how many companies are headquartered in Japan?
+
+:::{note} Answer
+:class: dropdown
+Use a text facet on **HqCountry** and sort by count: the United States has 140 companies, China 127 and Japan 40.
+:::
+
+**2. Clustering.** Which method would group each pair: (a) "Smith & Sons" and "smith and sons"; (b) "Catherine" and "Kathryn"; (c) "Johnson" and "Jonhson"?
+
+:::{note} Answer
+:class: dropdown
+(a) Neither fingerprint nor nearest neighbor reliably equates "&" with "and"; standardize "&" to "and" first (`value.replace("&", "and")`), then fingerprint groups them. (b) A phonetic key collision method (such as Metaphone). (c) Nearest neighbor with Levenshtein distance. A transposition counts as a distance of 2, so raise the radius from its default of 1 to 2.
+:::
+
+**3. GREL.** Write GREL expressions to (a) turn `"  mid-west REGION "` into `Mid-West Region`; (b) turn the text `03/14/2026` into the text `2026-03-14`.
+
+:::{note} Answer
+:class: dropdown
+(a) `value.trim().toTitlecase()`. (b) `value.toDate("MM/dd/yyyy").toString("yyyy-MM-dd")`.
+:::
+
+**4. A repeatable recipe.** Clean the Fortune file as in the worked example, extract the operation history as JSON, then create a new project from the same file and **Apply...** the JSON. Do you get the same result? Which step did not replay as you expected, and why?
+
+## Key terms
+
+OpenRefine, project, parsing options, character encoding, facet (text, numeric, blank, timeline), text filter, clustering, key collision, fingerprint, phonetic key, nearest neighbor, Levenshtein distance, common transforms, GREL, operation history, export
+
+## Further reading
+
+- OpenRefine, [User Manual](https://openrefine.org/docs), including the pages on facets, clustering and GREL.

@@ -1,113 +1,69 @@
 # Project Ideas
 
-End-of-semester project prompts, designed to exercise multiple chapters at once. Each one is scoped for a team of 3–4 students working over 4–6 weeks.
+Projects that combine several chapters, using the free tools of this book. Each is scoped for a team of three or four people over four to six weeks, or for one person working on their own at a slower pace. Every project should end with a short report that states your assumptions, shows your design diagrams, and explains how you checked your results.
 
-## 1. Retail sales warehouse
+## 1. From open data to a data warehouse
 
-**What to build:** End-to-end pipeline from a public retail dataset (e.g., Online Retail II, Brazilian E-Commerce) into a Kimball star schema, with SCD Type 2 on customers.
+**What to build:** Take a public dataset from a city open-data portal (for example, 311 service requests, building permits or crime reports) and build a dimensional data mart for it in Oracle Cloud.
 
-**Chapters exercised:** SQL (Part II), profiling & processing (Part III), databases (Part IV), warehousing + ETL (Part V).
+**Steps:** Profile the raw data ([Data Profiling](../data-profiling/intro.md)) and clean it in OpenRefine or Python ([Data Processing](../data-processing/intro.md)). Design a star schema with a declared grain ([Data Warehouse Design](../dw-design/intro.md)), load it with SQL ([ETL](../etl-procedure/intro.md)), and answer five business questions with star-join queries.
 
-**Deliverables:** ER diagram of the source, star schema diagram of the warehouse, SQL scripts for DDL and the ETL, and five business-question queries answered against the warehouse.
+**Deliverables:** profiling summary, cleaning recipe (OpenRefine operation history or code), star schema diagram in draw.io, ETL script, reconciliation of row counts and totals, and the five queries with their results.
 
----
+## 2. Designing a database for a small organization
 
-## 2. Airline operational dashboard
+**What to build:** Interview someone who runs a small organization (a club, a clinic, a shop, a nonprofit) and design a database for one of its processes.
 
-**What to build:** Ingest a public flight dataset (BTS On-Time Performance, OpenSky), load into a warehouse with role-playing date dimensions, build a Power BI / Tableau / Looker Studio dashboard.
+**Steps:** Write the business rules, draw an EER diagram ([Databases and the ER Model](../er-model/intro.md)), map it to a relational model ([The Relational Model](../relational-model/intro.md)), check it with normalization ([Normalization](../normalization/intro.md)), and implement it with DDL and sample data ([SQL: DDL, DCL and DML](../sql-ddl-dcl-dml/intro.md)).
 
-**Chapters exercised:** DW concepts, advanced DW design (role-playing, conformed dims), ETL, SQL querying.
+**Deliverables:** business rules, EER diagram with assumptions, relational model, DDL script with constraints, sample data, ten SQL queries the organization would actually ask, and a reverse-engineered diagram from Oracle's Data Modeler compared with your design.
 
-**Deliverables:** Dashboard with filters by carrier, route, and month; on-time % by route; delay breakdown by cause; aircraft utilization.
+## 3. A second data mart with conformed dimensions
 
----
+**What to build:** Extend the Northwind warehouse of [ETL Example: Northwind](../etl-northwind/intro.md) with a second fact table, for example freight at the order grain, or an inventory snapshot of products.
 
-## 3. Fraud detection with a graph database
+**Steps:** Declare the new grain, reuse (conform) the existing dimensions, load the new facts, and write queries that combine both fact tables.
 
-**What to build:** Load a synthetic or public payments dataset (PaySim, Elliptic++) into Neo4j; detect suspicious rings with Cypher queries and centrality algorithms.
+**Deliverables:** constellation diagram, ETL script, reconciliation, and five cross-process queries (for example, freight cost as a share of sales by shipper and year).
 
-**Chapters exercised:** Graph databases, data processing, governance.
+## 4. A slowly changing dimension in practice
 
-**Deliverables:** Graph schema, loading scripts, three Cypher queries finding ring-fraud, mule accounts, and anomalous high-degree nodes; a short governance memo on what controls a bank would need before deploying this.
+**What to build:** Simulate a year of changes to a customer or product dimension (moves, segment changes, price changes) and implement Type 1, Type 2 and Type 3 handling for different attributes.
 
----
+**Steps:** Design which attributes get which treatment and why ([Advanced DW Design](../dw-design-advanced/intro.md)), write the SQL that applies each month's changes, and show how a report on last year's sales changes (or does not) under each type.
 
-## 4. University knowledge graph
+**Deliverables:** design rationale, SQL for each change type, before-and-after tables, and the comparison of reports.
 
-**What to build:** Scrape public course catalog + faculty pages; model as a knowledge graph (faculty, courses, departments, research areas); query it with Cypher.
+## 5. A network analysis with Neo4j
 
-**Chapters exercised:** Graph databases, data wrangling, data governance (PII considerations).
+**What to build:** Model a connected dataset as a property graph: the trade network of [Graph Databases](../graph-databases/intro.md), a public transport network, a citation network, or co-authorship data.
 
-**Deliverables:** Graph model, loader, five Cypher queries ("which faculty could co-teach a course on X?", "shortest collaboration path between two researchers").
+**Steps:** Design the nodes, relationships and properties; load them with `LOAD CSV`; profile the graph (counts, zero-valued relationships, missing coverage); and answer questions that need several hops.
 
----
+**Deliverables:** graph model diagram, load script, verification queries, five multi-hop Cypher queries, and a comparison with how the same questions would be written in SQL.
 
-## 5. Hadoop / Spark log analytics on GCP
+## 6. A data governance review
 
-**What to build:** Process a large log dataset (NASA access logs, Common Crawl subset) on Dataproc; produce hourly / daily aggregations; write results to BigQuery or back to GCS as Parquet.
+**What to build:** Choose a dataset used in a real or realistic organization (for example, a student success model or a customer loyalty program) and write a governance plan for it.
 
-**Chapters exercised:** Big Data trio (Hadoop, GCP Dataproc, Spark).
+**Steps:** Identify the applicable laws and policies, the data owners and stewards, the minimum data needed, the protection measures, the ethical risks, and the retention period ([Data Governance](../data-governance/intro.md)). Profile a sample to find quality issues that would affect decisions.
 
-**Deliverables:** Spark job source, cluster create/delete scripts, cost log for the run, output dashboard.
+**Deliverables:** a governance plan of three to five pages, a data inventory with classifications, and a short risk register.
 
----
+## 7. Big data with Spark
 
-## 6. RAG over lecture slides
+**What to build:** Analyze a dataset too large to open comfortably in Excel (several million rows, such as a year of taxi trips or bike-share rides) with PySpark ([Apache Spark](../spark/intro.md)).
 
-**What to build:** Chunk every lecture PDF from this course, embed with an open-source model, store in a vector DB (Chroma or pgvector), expose a chat interface that answers questions with citations.
+**Steps:** Read the data with an explicit schema, profile it, clean it, and answer analytical questions with both the DataFrame API and Spark SQL. Optionally, run the same job on a cloud Hadoop cluster and compare.
 
-**Chapters exercised:** Vector databases.
+**Deliverables:** notebook with commentary, a profile of the data, five analytical results, and a note on what you would change to run the job on a real cluster.
 
-**Deliverables:** Ingestion script, vector DB with metadata filters (by chapter), chat UI, 10 test questions with actual vs. expected answers, discussion of hallucination risks.
+## Evaluation (suggested)
 
----
-
-## 7. Data governance audit
-
-**What to build:** Pick a public dataset (e.g., Chicago taxi trips, city-level crime data) and produce a full governance audit: catalog entry, PII classification, lineage diagram of a realistic downstream pipeline, retention policy, DPIA-style risk assessment.
-
-**Chapters exercised:** Data governance, plus touches on every data-handling chapter.
-
-**Deliverables:** Catalog spec, classification table, lineage diagram, retention policy, risk assessment memo.
-
----
-
-## 8. Lakehouse migration plan
-
-**What to build:** Take a mid-sized public dataset and implement the same pipeline three ways — (a) PostgreSQL warehouse, (b) BigQuery / Snowflake, (c) Spark on Dataproc writing Delta or Iceberg. Compare cost, latency, and developer experience.
-
-**Chapters exercised:** Warehousing concepts, Spark, big data architecture.
-
-**Deliverables:** Pipeline code for all three variants, a benchmarking notebook, and a 3-page recommendation memo.
-
----
-
-## 9. OpenRefine + dbt cleanup pipeline
-
-**What to build:** Take a genuinely messy public dataset (e.g., WHO country indicators with inconsistent names, USGS earthquakes with mixed date formats) and run it through OpenRefine → CSV → a dbt project in DuckDB or PostgreSQL that produces a clean star schema.
-
-**Chapters exercised:** Data processing, OpenRefine, profiling, warehousing.
-
-**Deliverables:** OpenRefine operation recipe, dbt project, documented quality tests.
-
----
-
-## 10. Healthcare warehouse with governance constraints
-
-**What to build:** Using the MIMIC-III / MIMIC-IV demo dataset (public, de-identified ICU data), design a star schema for visits with de-identification and access-control considerations baked in.
-
-**Chapters exercised:** Data warehousing design, governance, SQL.
-
-**Deliverables:** Data-use agreement adherence memo, schema diagram, DDL, three clinical analytic queries, and an access-control plan (who can see what).
-
----
-
-## Evaluation rubric (suggested)
-
-Rate each project on five dimensions, 1–5 scale:
-
-1. **Correctness** — does it produce the right answers?
-2. **Design quality** — is the schema / pipeline / model well-chosen for the problem?
-3. **Code quality** — readable, organized, version-controlled?
-4. **Governance awareness** — appropriate controls, privacy, and documentation?
-5. **Communication** — can a business stakeholder understand the deliverables?
+| Criterion | Weight |
+|---|---|
+| Correctness: designs follow the rules, queries return verified results | 30% |
+| Data quality: profiling, cleaning and reconciliation are shown | 20% |
+| Design rationale: assumptions and choices are stated and justified | 20% |
+| Communication: clear diagrams and a readable report | 20% |
+| Governance and ethics: privacy, access and fairness are addressed | 10% |
